@@ -47,7 +47,18 @@ class GameScene {
 	Audio* audio_ = nullptr;
 	DebugText* debugText_ = nullptr;
 
+	//プレイヤー
+	uint32_t textureHandlePlayer_ = 0;
+	Model* modelplayer_;
+	WorldTransform worldTransformPlayer_;
+	WorldTransform worldTransform_;
+	ViewProjection viewProjection_;
+	int JumpCount = 0;
+	int JumpMode = 0;
+	float JumpSpeed_ = 0;
+
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>
+	void PlayerUpdate();
 };
