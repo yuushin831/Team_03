@@ -1,10 +1,19 @@
 ﻿#include "GameScene.h"
 #include "TextureManager.h"
+//#include "WorldTransform.h"
 #include <cassert>
 
 GameScene::GameScene() {}
 
-GameScene::~GameScene() {}
+GameScene::~GameScene()
+{
+	//チュートリアルステージ解放
+	delete modelTutorialdome_;
+	//ノーマルステージ解放
+	delete modelNormaldome_;
+	//ハードステージ解放
+	delete modelHarddome_;
+}
 
 void GameScene::Initialize() {
 
@@ -12,9 +21,37 @@ void GameScene::Initialize() {
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
 	debugText_ = DebugText::GetInstance();
+	//チュートリアルステージ3Dモデルの生成
+	modelTutorialdome_ = Model::CreateFromOBJ("tutorialdome", true);
+	//ノーマルステージ3Dモデルの生成
+	modelNormaldome_ = Model::CreateFromOBJ("normaldome", true);
+	//ハードステージ3Dモデルの生成
+	modelHarddome_ = Model::CreateFromOBJ("harddome", true);
+	//チュートリアルステージ生成
+	tutorialST_ = new TutorialST();
+	//チュートリアルステージ初期化
+	tutorialST_->Initialize(modelTutorialdome_);
+	//ノーマルステージ生成
+	normalST_ = new NormalST();
+	//ノーマルステージ初期化
+	normalST_->Initialize(modelNormaldome_);
+	//ハードステージ生成
+	hardST_ = new HardST();
+	//ハードステージ初期化
+	hardST_->Initialize(modelHarddome_);
+	//ビュープロジェクション
+	viewProjection_.Initialize();
 }
 
-void GameScene::Update() {}
+void GameScene::Update()
+{
+	//チュートリアルステージ更新
+	tutorialST_->Update();
+	//ノーマルステージ更新
+	normalST_->Update();
+	//ハードステージ更新
+	hardST_->Update();
+}
 
 void GameScene::Draw() {
 
@@ -28,7 +65,6 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに背景スプライトの描画処理を追加できる
 	/// </summary>
-
 	// スプライト描画後処理
 	Sprite::PostDraw();
 	// 深度バッファクリア
@@ -42,6 +78,12 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
+	//チュートリアルステージ描画
+	tutorialST_->Draw(viewProjection_);
+	//ノーマルステージ描画 
+	normalST_->Draw(viewProjection_);
+	//ハードステージ描画
+	hardST_->Draw(viewProjection_);
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
