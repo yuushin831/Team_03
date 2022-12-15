@@ -4,17 +4,36 @@
 
 GameScene::GameScene() {}
 
-GameScene::~GameScene() {}
+GameScene::~GameScene() 
+{
+	delete spriteTitle_;
+}
 
-void GameScene::Initialize() {
-
+void GameScene::Initialize()
+{
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
 	debugText_ = DebugText::GetInstance();
+
+	//タイトル２ｄ
+	texturHandleTitle_ = TextureManager::Load("Title.png");
+	spriteTitle_ = Sprite::Create(texturHandleTitle_, { 0,0 });
 }
 
-void GameScene::Update() {}
+void GameScene::Update()
+{
+	//各シーンの更新処理を呼び出す
+	switch (sceneMode_)
+	{
+	/*case 0:
+		GaemPlayUpdate();
+		break;*/
+	case 1:
+		TitleUpdate();
+		break;
+	}
+}
 
 void GameScene::Draw() {
 
@@ -27,8 +46,17 @@ void GameScene::Draw() {
 
 	/// <summary>
 	/// ここに背景スプライトの描画処理を追加できる
-	/// </summary>
-
+	/// </summary>sishi
+	//各シーンの更新処理を呼び出す
+	switch (sceneMode_)
+	{
+	//case 0:
+	//	GaemPlayDraw2DNear();
+	//	break;
+	case 1:
+		TitleDraw2DNear();
+		break;
+	}
 	// スプライト描画後処理
 	Sprite::PostDraw();
 	// 深度バッファクリア
@@ -62,4 +90,24 @@ void GameScene::Draw() {
 	Sprite::PostDraw();
 
 #pragma endregion
+}
+//タイトル更新
+void GameScene::TitleUpdate()
+{
+	//エンターキーを押した瞬間
+	if (input_->TriggerKey(DIK_RETURN))
+	{
+		//ゲームプレイ移行
+		sceneMode_ = 0;
+	}
+}
+//タイトル表示
+void GameScene::TitleDraw2DNear()
+{
+	spriteTitle_->Draw();
+}
+//ゲームプレイ更新
+void GameScene::GaemPlayUpdate()
+{
+
 }
