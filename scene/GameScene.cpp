@@ -1,5 +1,6 @@
 ﻿#include "GameScene.h"
 #include "TextureManager.h"
+#include"SetMatrix.h"
 #include <cassert>
 
 GameScene::GameScene() {}
@@ -21,12 +22,63 @@ void GameScene::Initialize() {
 	//プレイヤー
 	textureHandlePlayer_ = TextureManager::Load("player.png");
 	modelplayer_ = Model::Create();
-	worldTransformPlayer_.scale_ = { 0.5f,0.5f,0.5f };
+	//worldTransformPlayer_.scale_ = { 0.5f,0.5f,0.5f };
 	worldTransformPlayer_.Initialize();
 
 	worldTransformPlayer_.scale_ = { 1.0f,1.0f,1.0f };
 
-	Matrix4 matIdentity;
+	//Matrix4 matScale = CreatematWorld(worldTransformPlayer_);
+	worldTransformPlayer_.matWorld_ = CreatematWorld(worldTransformPlayer_);
+	worldTransformPlayer_.TransferMatrix();
+	
+
+
+
+	
+}
+
+void GameScene::Update() {
+	//移動
+	if (input_->PushKey(DIK_D))
+	{
+		worldTransformPlayer_.translation_.x += 0.5f;
+	}
+	if (input_->PushKey(DIK_A))
+	{
+		worldTransformPlayer_.translation_.x -= 0.5f;
+	}
+
+	/*if (worldTransformPlayer_.translation_.x >= 4) {
+		worldTransformPlayer_.translation_.x = 4;
+	}
+
+	if (worldTransformPlayer_.translation_.x <= -4) {
+		worldTransformPlayer_.translation_.x = -4;
+	}*/
+
+	if (input_->PushKey(DIK_SPACE) && JumpCount == 0)
+	{
+		JumpMode = 1;
+		JumpCount = 1;
+		JumpSpeed_ = 0.5f;//ジャンプの初速
+
+	}
+	//ジャンプ実施
+	if (JumpCount == 1)
+	{
+		worldTransformPlayer_.translation_.y += JumpSpeed_;//Y座標にジャンプスピードを加える
+		JumpSpeed_ -= 0.01f;//ジャンプスピードに重力を加える
+		if (worldTransformPlayer_.translation_.y <= 0) {//着地したら
+			worldTransformPlayer_.translation_.y = 0;//めり込みを防ぐ
+			JumpCount = 0;
+		}
+	}
+
+	worldTransformPlayer_.matWorld_ = CreatematWorld(worldTransformPlayer_);
+	worldTransformPlayer_.TransferMatrix();
+	debugText_->SetPos(0, 0);
+	debugText_->Printf("%f,%f,%f", worldTransformPlayer_.translation_.x, worldTransformPlayer_.translation_.y, worldTransformPlayer_.translation_.z);
+	/*Matrix4 matIdentity;
 	matIdentity.m[0][0] = 1;
 	matIdentity.m[1][1] = 1;
 	matIdentity.m[2][2] = 1;
@@ -37,16 +89,14 @@ void GameScene::Initialize() {
 	matScale.m[0][0] = worldTransformPlayer_.scale_.x;
 	matScale.m[1][1] = worldTransformPlayer_.scale_.y;
 	matScale.m[2][2] = worldTransformPlayer_.scale_.z;
-	matScale.m[3][3] = 1;
+	matScale.m[3][3] = 1;*/
 
 	/*worldTransformPlayer_.matWorld_ = matIdentity;
 	worldTransformPlayer_.matWorld_ *= matScale;*/
 
 
-	worldTransformPlayer_.translation_ = { -10.0f,1.0f,1.0f };
+	/*Matrix4 matTrans = MathUtility::Matrix4Identity();
 
-	Matrix4 matTrans = MathUtility::Matrix4Identity();
-	
 	matTrans.m[3][0] = worldTransformPlayer_.translation_.x;
 	matTrans.m[3][1] = worldTransformPlayer_.translation_.y;
 	matTrans.m[3][2] = worldTransformPlayer_.translation_.z;
@@ -56,13 +106,9 @@ void GameScene::Initialize() {
 	worldTransformPlayer_.matWorld_ *= matScale *= matTrans;
 
 
-	worldTransformPlayer_.TransferMatrix();
+	worldTransformPlayer_.TransferMatrix();*/
 
-
-	
 }
-
-void GameScene::Update() {}
 
 void GameScene::Draw() {
 
@@ -116,42 +162,7 @@ void GameScene::Draw() {
 
 void GameScene::PlayerUpdate()
 {
-	//移動
-
-	if (input_->PushKey(DIK_D)) 
-	{
-		worldTransformPlayer_.translation_.x += 0.5f;
-	}
-	if (input_->PushKey(DIK_A)) 
-	{
-		worldTransformPlayer_.translation_.x -= 0.5f;
-	}
-
-	if (worldTransformPlayer_.translation_.x >= 4) {
-		worldTransformPlayer_.translation_.x = 4;
-	}
-
-	if (worldTransformPlayer_.translation_.x <= -4) {
-		worldTransformPlayer_.translation_.x = -4;
-	}
-
-	if (input_->PushKey(DIK_SPACE)&&JumpCount==0)
-	{
-		JumpMode = 1;
-		JumpCount = 1;
-		JumpSpeed_ = 0.2f;//ジャンプの初速
-
-	}
-	//ジャンプ実施
-	if (JumpCount == 1)
-	{
-		worldTransformPlayer_.translation_.y += JumpSpeed_;//Y座標にジャンプスピードを加える
-		JumpSpeed_ -= 0.01f;//ジャンプスピードに重力を加える
-		if (worldTransformPlayer_.translation_.y <= 0) {//着地したら
-			worldTransformPlayer_.translation_.y = 0;//めり込みを防ぐ
-			JumpCount = 0;
-		}
-	}
+	
 	//worldTransformPlayer_.UpdateMatrix();
 
 	

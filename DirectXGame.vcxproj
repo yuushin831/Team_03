@@ -104,6 +104,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="scene\GameScene.cpp" />
+    <ClCompile Include="SetMatrix.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="2d\DebugText.h" />
@@ -136,6 +137,7 @@
     <ClInclude Include="math\Vector4.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="scene\GameScene.h" />
+    <ClInclude Include="SetMatrix.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\TerrainPS.hlsl">
