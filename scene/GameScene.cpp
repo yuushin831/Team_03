@@ -48,13 +48,13 @@ void GameScene::Update() {
 		worldTransformPlayer_.translation_.x -= 0.5f;
 	}
 
-	/*if (worldTransformPlayer_.translation_.x >= 4) {
-		worldTransformPlayer_.translation_.x = 4;
+	if (worldTransformPlayer_.translation_.x >= 35.5f) {
+		worldTransformPlayer_.translation_.x = 35.5f;
 	}
 
-	if (worldTransformPlayer_.translation_.x <= -4) {
-		worldTransformPlayer_.translation_.x = -4;
-	}*/
+	if (worldTransformPlayer_.translation_.x <= -35.5f) {
+		worldTransformPlayer_.translation_.x = -35.5f;
+	}
 
 	if (input_->PushKey(DIK_SPACE) && JumpCount == 0)
 	{
