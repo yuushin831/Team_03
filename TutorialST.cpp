@@ -11,7 +11,6 @@ void TutorialST::Initialize(Model*model)
 	worldTransform_.scale_ = { 100,100,100 };
 	worldTransform_.translation_ = { 0,0,0 };
 }
-
 //XV
 void TutorialST::Update()
 {
@@ -24,5 +23,5 @@ void TutorialST::Update()
 //•\Ž¦
 void TutorialST::Draw(ViewProjection& viewProjection_)
 {
-	//model_->Draw(worldTransform_, viewProjection_);
+	model_->Draw(worldTransform_, viewProjection_);
 }

@@ -23,5 +23,5 @@ void NormalST::Update()
 //•\Ž¦
 void NormalST::Draw(ViewProjection& viewProjection_)
 {
-	//model_->Draw(worldTransform_, viewProjection_);
+	model_->Draw(worldTransform_, viewProjection_);
 }

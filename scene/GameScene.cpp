@@ -1,10 +1,11 @@
 ﻿#include "GameScene.h"
 #include "TextureManager.h"
+#include"SetMatrix.h"
 //#include "WorldTransform.h"
 #include <cassert>
-
+//コンストラクタ
 GameScene::GameScene() {}
-
+//デストラクタ
 GameScene::~GameScene()
 {
 	//チュートリアルステージ解放
@@ -13,8 +14,15 @@ GameScene::~GameScene()
 	delete modelNormaldome_;
 	//ハードステージ解放
 	delete modelHarddome_;
-}
 
+	delete title_;
+	delete GameScene_;
+	delete GamePlay_;
+	delete GameCrear_;
+	delete GameOver_;
+	delete modelplayer_;
+}
+//初期化
 void GameScene::Initialize() {
 
 	dxCommon_ = DirectXCommon::GetInstance();
@@ -41,8 +49,37 @@ void GameScene::Initialize() {
 	hardST_->Initialize(modelHarddome_);
 	//ビュープロジェクション
 	viewProjection_.Initialize();
-}
 
+	worldTransform_.Initialize();
+	viewProjection_.Initialize();
+
+	//テクスチャを入れ込む
+	textureHandle_[0] = TextureManager::Load("Title.png");
+	textureHandle_[1] = TextureManager::Load("GameScene.png");
+	textureHandle_[2] = TextureManager::Load("GamePlay.png");
+	textureHandle_[3] = TextureManager::Load("GameCrear.png");
+	textureHandle_[4] = TextureManager::Load("GameOver.png");
+	//プレイヤー
+	textureHandlePlayer_ = TextureManager::Load("player.png");
+
+	//スプライトを生成
+	title_ = Sprite::Create(textureHandle_[0], { 0,0 });
+	GameScene_ = Sprite::Create(textureHandle_[1], { 0,0 });
+	GamePlay_ = Sprite::Create(textureHandle_[2], { 0,0 });
+	GameCrear_ = Sprite::Create(textureHandle_[3], { 0,0 });
+	GameOver_ = Sprite::Create(textureHandle_[4], { 0,0 });
+
+	modelplayer_ = Model::Create();
+	//worldTransformPlayer_.scale_ = { 0.5f,0.5f,0.5f };
+	worldTransformPlayer_.Initialize();
+
+	worldTransformPlayer_.scale_ = { 1.0f,1.0f,1.0f };
+
+	//Matrix4 matScale = CreatematWorld(worldTransformPlayer_);
+	worldTransformPlayer_.matWorld_ = CreatematWorld(worldTransformPlayer_);
+	worldTransformPlayer_.TransferMatrix();
+}
+//更新
 void GameScene::Update()
 {
 	//チュートリアルステージ更新
@@ -51,8 +88,103 @@ void GameScene::Update()
 	normalST_->Update();
 	//ハードステージ更新
 	hardST_->Update();
-}
+	switch (scene_)
+	{
 
+		//タイトル
+	case 0:
+#pragma region TITLE
+		//初期化
+		Timer = 250;
+		if (input_->TriggerKey(DIK_RIGHT))
+		{
+			scene_ = 1;
+		}
+		break;
+
+		//ゲーム説明
+	case 1:
+#pragma region GAMESCENE
+		if (input_->TriggerKey(DIK_RIGHT))
+		{
+			scene_ = 2;
+		}
+
+		//ゲームプレイ
+	case 2:
+#pragma region GAMEPLAY
+
+		//移動
+		if (input_->PushKey(DIK_D))
+		{
+			worldTransformPlayer_.translation_.x += 0.5f;
+		}
+		if (input_->PushKey(DIK_A))
+		{
+			worldTransformPlayer_.translation_.x -= 0.5f;
+		}
+
+		if (worldTransformPlayer_.translation_.x >= 35.5f) {
+			worldTransformPlayer_.translation_.x = 35.5f;
+		}
+
+		if (worldTransformPlayer_.translation_.x <= -35.5f) {
+			worldTransformPlayer_.translation_.x = -35.5f;
+		}
+
+		if (input_->PushKey(DIK_W) && JumpCount == 0)
+		{
+			JumpMode = 1;
+			JumpCount = 1;
+			JumpSpeed_ = 0.5f;//ジャンプの初速
+
+		}
+		//ジャンプ実施
+		if (JumpCount == 1)
+		{
+			worldTransformPlayer_.translation_.y += JumpSpeed_;//Y座標にジャンプスピードを加える
+			JumpSpeed_ -= 0.01f;//ジャンプスピードに重力を加える
+			if (worldTransformPlayer_.translation_.y <= 0) {//着地したら
+				worldTransformPlayer_.translation_.y = 0;//めり込みを防ぐ
+				JumpCount = 0;
+			}
+		}
+
+		worldTransformPlayer_.matWorld_ = CreatematWorld(worldTransformPlayer_);
+		worldTransformPlayer_.TransferMatrix();
+		/*if (scene_ == 2)
+		{
+			Timer--;
+		}
+		if (Timer < 0)
+		{
+			scene_ = 4;
+		}*/
+
+		//ゲームクリア
+	case 3:
+#pragma region GAMECREAR
+		if (input_->TriggerKey(DIK_RIGHT))
+		{
+			scene_ = 2;
+		}
+
+		//ゲームオーバー
+	case 4:
+#pragma region GAMEOVER
+		if (input_->TriggerKey(DIK_RIGHT))
+		{
+			scene_ = 2;
+		}
+	}
+
+	//テキストの表示
+	DebugText::GetInstance()->SetPos(1000, 0);
+	DebugText::GetInstance()->Printf("scene_:%d", scene_);
+	DebugText::GetInstance()->SetPos(1000, 30);
+	DebugText::GetInstance()->Printf("Timer:%d", Timer);
+}
+//表示
 void GameScene::Draw() {
 
 	// コマンドリストの取得
@@ -78,13 +210,16 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
+	
+	//////////シーン分け待ちここから//////////
+	modelplayer_->Draw(worldTransformPlayer_, viewProjection_, textureHandlePlayer_);
 	//チュートリアルステージ描画
 	tutorialST_->Draw(viewProjection_);
 	//ノーマルステージ描画 
-	normalST_->Draw(viewProjection_);
+	//normalST_->Draw(viewProjection_);
 	//ハードステージ描画
-	hardST_->Draw(viewProjection_);
-
+	//hardST_->Draw(viewProjection_);
+	//////////シーン分け待ちここまで//////////
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
 #pragma endregion
@@ -96,6 +231,26 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
+		//表示
+	switch (scene_)
+	{
+	case 0:
+		title_->Draw();
+		break;
+	case 1:
+		GameScene_->Draw();
+		break;
+	case 2:
+		//GamePlay_->Draw();
+		debugText_->DrawAll(commandList);
+		break;
+	case 3:
+		GameCrear_->Draw();
+		break;
+	case 4:
+		GameOver_->Draw();
+		break;
+	}
 
 	// デバッグテキストの描画
 	debugText_->DrawAll(commandList);

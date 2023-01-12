@@ -51,6 +51,30 @@ class GameScene {
 	Audio* audio_ = nullptr;
 	DebugText* debugText_ = nullptr;
 
+	uint32_t textureHandle_[12];
+
+	//シーン管理
+	Sprite* title_ = nullptr;
+	Sprite* GameScene_ = nullptr;
+	Sprite* GamePlay_ = nullptr;
+	Sprite* GameCrear_ = nullptr;
+	Sprite* GameOver_ = nullptr;
+
+	//プレイヤー
+	uint32_t textureHandlePlayer_ = 0;
+	Model* modelplayer_;
+	WorldTransform worldTransformPlayer_;
+	WorldTransform worldTransform_;
+	int JumpCount = 0;
+	int JumpMode = 0;
+	float JumpSpeed_ = 0;
+
+	//シーン
+	int scene_ = 0;
+
+	//タイマー
+	int Timer = 250;
+
 
 	//チュートリアルステージ
 	Model* modelTutorialdome_ = nullptr;
@@ -64,4 +88,5 @@ class GameScene {
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>
+	void PlayerUpdate();
 };

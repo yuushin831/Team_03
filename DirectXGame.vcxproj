@@ -106,6 +106,7 @@
     <ClCompile Include="NormalST.cpp" />
     <ClCompile Include="Procession.cpp" />
     <ClCompile Include="scene\GameScene.cpp" />
+    <ClCompile Include="SetMatrix.cpp" />
     <ClCompile Include="TutorialST.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -141,6 +142,7 @@
     <ClInclude Include="NormalST.h" />
     <ClInclude Include="Procession.h" />
     <ClInclude Include="scene\GameScene.h" />
+    <ClInclude Include="SetMatrix.h" />
     <ClInclude Include="TutorialST.h" />
   </ItemGroup>
   <ItemGroup>
