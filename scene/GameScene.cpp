@@ -83,11 +83,11 @@ void GameScene::Initialize() {
 void GameScene::Update()
 {
 	//チュートリアルステージ更新
-	tutorialST_->Update();
+	//tutorialST_->Update();
 	//ノーマルステージ更新
-	normalST_->Update();
+	//normalST_->Update();
 	//ハードステージ更新
-	hardST_->Update();
+	//hardST_->Update();
 	switch (scene_)
 	{
 
@@ -105,15 +105,25 @@ void GameScene::Update()
 		//ゲーム説明
 	case 1:
 #pragma region GAMESCENE
-		if (input_->TriggerKey(DIK_RIGHT))
+		if (input_->TriggerKey(DIK_1))
 		{
 			scene_ = 2;
 		}
+		if (input_->TriggerKey(DIK_2))
+		{
+			scene_ = 3;
+		}
+		if (input_->TriggerKey(DIK_3))
+		{
+			scene_ = 4;
+		}
 
-		//ゲームプレイ
+		break;
+		//ゲームプレイ(チュートリアルステージ)
 	case 2:
 #pragma region GAMEPLAY
-
+		//チュートリアルステージ更新
+		tutorialST_->Update();
 		//移動
 		if (input_->PushKey(DIK_D))
 		{
@@ -158,24 +168,152 @@ void GameScene::Update()
 		}
 		if (Timer < 0)
 		{
-			scene_ = 4;
+			scene_ = 6;
 		}*/
 
-		//ゲームクリア
+		break;
+		//ゲームプレイ(ノーマルステージ)
 	case 3:
+#pragma region GAMEPLAY
+		//ノーマルステージ更新
+		normalST_->Update();
+		//移動
+		if (input_->PushKey(DIK_D))
+		{
+			worldTransformPlayer_.translation_.x += 0.5f;
+		}
+		if (input_->PushKey(DIK_A))
+		{
+			worldTransformPlayer_.translation_.x -= 0.5f;
+		}
+
+		if (worldTransformPlayer_.translation_.x >= 35.5f) {
+			worldTransformPlayer_.translation_.x = 35.5f;
+		}
+
+		if (worldTransformPlayer_.translation_.x <= -35.5f) {
+			worldTransformPlayer_.translation_.x = -35.5f;
+		}
+
+		if (input_->PushKey(DIK_W) && JumpCount == 0)
+		{
+			JumpMode = 1;
+			JumpCount = 1;
+			JumpSpeed_ = 0.5f;//ジャンプの初速
+
+		}
+		//ジャンプ実施
+		if (JumpCount == 1)
+		{
+			worldTransformPlayer_.translation_.y += JumpSpeed_;//Y座標にジャンプスピードを加える
+			JumpSpeed_ -= 0.01f;//ジャンプスピードに重力を加える
+			if (worldTransformPlayer_.translation_.y <= 0) {//着地したら
+				worldTransformPlayer_.translation_.y = 0;//めり込みを防ぐ
+				JumpCount = 0;
+			}
+		}
+
+		worldTransformPlayer_.matWorld_ = CreatematWorld(worldTransformPlayer_);
+		worldTransformPlayer_.TransferMatrix();
+		/*if (scene_ == 2)
+		{
+			Timer--;
+		}
+		if (Timer < 0)
+		{
+			scene_ = 7;
+		}*/
+
+		break;
+		//ゲームプレイ(ハードステージ)
+	case 4:
+#pragma region GAMEPLAY
+		//ハードステージ更新
+		hardST_->Update();
+		//移動
+		if (input_->PushKey(DIK_D))
+		{
+			worldTransformPlayer_.translation_.x += 0.5f;
+		}
+		if (input_->PushKey(DIK_A))
+		{
+			worldTransformPlayer_.translation_.x -= 0.5f;
+		}
+
+		if (worldTransformPlayer_.translation_.x >= 35.5f) {
+			worldTransformPlayer_.translation_.x = 35.5f;
+		}
+
+		if (worldTransformPlayer_.translation_.x <= -35.5f) {
+			worldTransformPlayer_.translation_.x = -35.5f;
+		}
+
+		if (input_->PushKey(DIK_W) && JumpCount == 0)
+		{
+			JumpMode = 1;
+			JumpCount = 1;
+			JumpSpeed_ = 0.5f;//ジャンプの初速
+
+		}
+		//ジャンプ実施
+		if (JumpCount == 1)
+		{
+			worldTransformPlayer_.translation_.y += JumpSpeed_;//Y座標にジャンプスピードを加える
+			JumpSpeed_ -= 0.01f;//ジャンプスピードに重力を加える
+			if (worldTransformPlayer_.translation_.y <= 0) {//着地したら
+				worldTransformPlayer_.translation_.y = 0;//めり込みを防ぐ
+				JumpCount = 0;
+			}
+		}
+
+		worldTransformPlayer_.matWorld_ = CreatematWorld(worldTransformPlayer_);
+		worldTransformPlayer_.TransferMatrix();
+		/*if (scene_ == 2)
+		{
+			Timer--;
+		}
+		if (Timer < 0)
+		{
+			scene_ = 8;
+		}*/
+
+		break;
+		//ゲームクリア
+	case 5:
 #pragma region GAMECREAR
 		if (input_->TriggerKey(DIK_RIGHT))
 		{
-			scene_ = 2;
+			scene_ = 0;
 		}
 
-		//ゲームオーバー
-	case 4:
+		break;
+		//ゲームオーバー(チュートリアルステージ)
+	case 6:
 #pragma region GAMEOVER
 		if (input_->TriggerKey(DIK_RIGHT))
 		{
 			scene_ = 2;
 		}
+
+		break;
+		//ゲームオーバー(ノーマルステージ)
+	case 7:
+#pragma region GAMEOVER
+		if (input_->TriggerKey(DIK_RIGHT))
+		{
+			scene_ = 3;
+		}
+
+		break;
+		//ゲームオーバー(ハードステージ)
+	case 8:
+#pragma region GAMEOVER
+		if (input_->TriggerKey(DIK_RIGHT))
+		{
+			scene_ = 4;
+		}
+
+		break;
 	}
 
 	//テキストの表示
@@ -210,16 +348,31 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
-	
+
 	//////////シーン分け待ちここから//////////
-	modelplayer_->Draw(worldTransformPlayer_, viewProjection_, textureHandlePlayer_);
-	//チュートリアルステージ描画
-	tutorialST_->Draw(viewProjection_);
-	//ノーマルステージ描画 
-	//normalST_->Draw(viewProjection_);
-	//ハードステージ描画
-	//hardST_->Draw(viewProjection_);
+	//modelplayer_->Draw(worldTransformPlayer_, viewProjection_, textureHandlePlayer_);
+
+
+
 	//////////シーン分け待ちここまで//////////
+	switch (scene_)
+	{
+	case 2:
+		modelplayer_->Draw(worldTransformPlayer_, viewProjection_, textureHandlePlayer_);
+		//チュートリアルステージ描画
+		tutorialST_->Draw(viewProjection_);
+		break;
+	case 3:
+		modelplayer_->Draw(worldTransformPlayer_, viewProjection_, textureHandlePlayer_);
+		//ノーマルステージ描画 
+		normalST_->Draw(viewProjection_);
+		break;
+	case 4:
+		modelplayer_->Draw(worldTransformPlayer_, viewProjection_, textureHandlePlayer_);
+		//ハードステージ描画
+		hardST_->Draw(viewProjection_);
+		break;
+	}
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
 #pragma endregion
@@ -245,9 +398,23 @@ void GameScene::Draw() {
 		debugText_->DrawAll(commandList);
 		break;
 	case 3:
-		GameCrear_->Draw();
+		//GamePlay_->Draw();
+		debugText_->DrawAll(commandList);
 		break;
 	case 4:
+		//GamePlay_->Draw();
+		debugText_->DrawAll(commandList);
+		break;
+	case 5:
+		GameCrear_->Draw();
+		break;
+	case 6:
+		GameOver_->Draw();
+		break;
+	case 7:
+		GameOver_->Draw();
+		break;
+	case 8:
 		GameOver_->Draw();
 		break;
 	}
