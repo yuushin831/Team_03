@@ -7,6 +7,7 @@ GameScene::GameScene() {}
 
 GameScene::~GameScene() {
 	delete modelplayer_;
+	delete modelgoal_;
 }
 
 void GameScene::Initialize() {
@@ -22,14 +23,22 @@ void GameScene::Initialize() {
 	//プレイヤー
 	textureHandlePlayer_ = TextureManager::Load("player.png");
 	modelplayer_ = Model::Create();
-	//worldTransformPlayer_.scale_ = { 0.5f,0.5f,0.5f };
 	worldTransformPlayer_.Initialize();
 
 	worldTransformPlayer_.scale_ = { 1.0f,1.0f,1.0f };
-
-	//Matrix4 matScale = CreatematWorld(worldTransformPlayer_);
+	worldTransformPlayer_.translation_ = { 0.0f,-19.5f,0.0f };
 	worldTransformPlayer_.matWorld_ = CreatematWorld(worldTransformPlayer_);
 	worldTransformPlayer_.TransferMatrix();
+
+	//ゴール
+	textureHandleGoal_ = TextureManager::Load("enemy.png");
+	modelgoal_ = Model::Create();
+	worldTransformGoal_.Initialize();
+
+	worldTransformGoal_.scale_ = { 1.0f,1.0f,1.0f };
+	worldTransformGoal_.translation_ = { 35.5f,-8.0f,0.0f };
+	worldTransformGoal_.matWorld_= CreatematWorld(worldTransformGoal_);
+	worldTransformGoal_.TransferMatrix();
 	
 
 
@@ -68,45 +77,22 @@ void GameScene::Update() {
 	{
 		worldTransformPlayer_.translation_.y += JumpSpeed_;//Y座標にジャンプスピードを加える
 		JumpSpeed_ -= 0.01f;//ジャンプスピードに重力を加える
-		if (worldTransformPlayer_.translation_.y <= 0) {//着地したら
-			worldTransformPlayer_.translation_.y = 0;//めり込みを防ぐ
+		if (worldTransformPlayer_.translation_.y <= -19.5f) {//着地したら
+			worldTransformPlayer_.translation_.y = -19.5f;//めり込みを防ぐ
 			JumpCount = 0;
 		}
 	}
+
+	Collision();
 
 	worldTransformPlayer_.matWorld_ = CreatematWorld(worldTransformPlayer_);
 	worldTransformPlayer_.TransferMatrix();
 	debugText_->SetPos(0, 0);
 	debugText_->Printf("%f,%f,%f", worldTransformPlayer_.translation_.x, worldTransformPlayer_.translation_.y, worldTransformPlayer_.translation_.z);
-	/*Matrix4 matIdentity;
-	matIdentity.m[0][0] = 1;
-	matIdentity.m[1][1] = 1;
-	matIdentity.m[2][2] = 1;
-	matIdentity.m[3][3] = 1;
+	debugText_->SetPos(0, 15);
+	debugText_->Printf("GoalFlag:%d", GoalFlag);
 
-	Matrix4 matScale;
-
-	matScale.m[0][0] = worldTransformPlayer_.scale_.x;
-	matScale.m[1][1] = worldTransformPlayer_.scale_.y;
-	matScale.m[2][2] = worldTransformPlayer_.scale_.z;
-	matScale.m[3][3] = 1;*/
-
-	/*worldTransformPlayer_.matWorld_ = matIdentity;
-	worldTransformPlayer_.matWorld_ *= matScale;*/
-
-
-	/*Matrix4 matTrans = MathUtility::Matrix4Identity();
-
-	matTrans.m[3][0] = worldTransformPlayer_.translation_.x;
-	matTrans.m[3][1] = worldTransformPlayer_.translation_.y;
-	matTrans.m[3][2] = worldTransformPlayer_.translation_.z;
-	matTrans.m[3][3] = 1;
-
-	worldTransformPlayer_.matWorld_ = matIdentity;
-	worldTransformPlayer_.matWorld_ *= matScale *= matTrans;
-
-
-	worldTransformPlayer_.TransferMatrix();*/
+	
 
 }
 
@@ -137,7 +123,7 @@ void GameScene::Draw() {
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
 	modelplayer_->Draw(worldTransformPlayer_, viewProjection_, textureHandlePlayer_);
-
+	modelgoal_->Draw(worldTransformGoal_, viewProjection_, textureHandleGoal_);
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
@@ -158,6 +144,35 @@ void GameScene::Draw() {
 	Sprite::PostDraw();
 
 #pragma endregion
+}
+
+void GameScene::Collision()
+{
+	CollisionPlayerGoal();
+}
+
+void GameScene::CollisionPlayerGoal()
+{
+	if (GoalFlag == 0)
+	{
+		float dx = (worldTransformPlayer_.translation_.x - worldTransformGoal_.translation_.x);
+		float dy = (worldTransformPlayer_.translation_.y - worldTransformGoal_.translation_.y);
+		float dz = (worldTransformPlayer_.translation_.z - worldTransformGoal_.translation_.z);
+		float PlayerR = 0.5f;//プレイヤー半径
+		float GoalR = 0.5f;//ゴール半径
+		float radius = (PlayerR + GoalR) * (PlayerR + GoalR);
+		// 二つの座標の距離
+		float dist = dx * dx + dy * dy + dz * dz;
+
+		if (dist <= radius)
+		{
+			GoalFlag = 1;
+			
+		}
+		
+	}
+	
+	
 }
 
 void GameScene::PlayerUpdate()

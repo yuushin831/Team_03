@@ -42,6 +42,16 @@ class GameScene {
 	/// </summary>
 	void Draw();
 
+	/// <summary>
+	/// 衝突判定
+	/// </summary>
+	void Collision();// 衝突判定
+	void CollisionPlayerGoal();// 衝突判定(プレイヤーとゴール)
+
+	
+
+	
+
   private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
@@ -52,11 +62,18 @@ class GameScene {
 	uint32_t textureHandlePlayer_ = 0;
 	Model* modelplayer_;
 	WorldTransform worldTransformPlayer_;
-	WorldTransform worldTransform_;
-	ViewProjection viewProjection_;
 	int JumpCount = 0;
 	int JumpMode = 0;
 	float JumpSpeed_ = 0;
+
+	//ゴール
+	uint32_t textureHandleGoal_ = 0;
+	Model* modelgoal_;
+	WorldTransform worldTransformGoal_;
+	int GoalFlag = 0;
+
+	WorldTransform worldTransform_;
+	ViewProjection viewProjection_;
 
 	/// <summary>
 	/// ゲームシーン用
