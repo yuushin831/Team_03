@@ -9,7 +9,8 @@
 #include "Sprite.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
-
+#include "Player.h"
+#include <Goal.h>
 
 /// <summary>
 /// ゲームシーン
@@ -46,7 +47,7 @@ class GameScene {
 	/// 衝突判定
 	/// </summary>
 	void Collision();// 衝突判定
-	void CollisionPlayerGoal();// 衝突判定(プレイヤーとゴール)
+	void CollisionPlayerGoal(Vector3 player, Vector3 goal);// 衝突判定(プレイヤーとゴール)
 
 	
 
@@ -66,10 +67,14 @@ class GameScene {
 	int JumpMode = 0;
 	float JumpSpeed_ = 0;
 
+	Player *player_;
+
+	Goal* goal_;
+
 	//ゴール
 	uint32_t textureHandleGoal_ = 0;
 	Model* modelgoal_;
-	WorldTransform worldTransformGoal_;
+	WorldTransform worldTransform;
 	int GoalFlag = 0;
 
 	WorldTransform worldTransform_;

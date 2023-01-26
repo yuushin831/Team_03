@@ -1,24 +1,16 @@
 #pragma once
 #include <cstdint>
 #include <Model.h>
-#include "Input.h"
-#include "DebugText.h"
-
-class Player
+class Goal
 {
 private:
-	Input* input_ = nullptr;
-	DebugText* debugText_ = nullptr;
-
 	uint32_t textureHandle_ = 0;
-	Model* modelplayer_;
+	Model* modelgoal_;
 	WorldTransform worldTransform_;
-	int JumpCount = 0;
-	int JumpMode = 0;
-	float JumpSpeed_ = 0;
+	int GoalFlag = 0;
 
-public://ƒƒ“ƒoŠÖ”
-	Player();
+public:
+	Goal();
 	/// <summary>
 	/// ‰Šú‰»
 	/// </summary>
@@ -30,7 +22,7 @@ public://ƒƒ“ƒoŠÖ”
 	/// <summary>
 	/// •`‰æ
 	/// </summary>
-	void Draw(ViewProjection &viewProjection);
+	void Draw(ViewProjection& viewProjection);
 
 	Vector3 GetPosition()
 	{
